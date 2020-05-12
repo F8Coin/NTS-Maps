@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../css/index.css">
+    <title>百度地图API接口</title>
+</head>
+<body>
+    <!-- 加载一个地图 -->
+    <div id="allmap"></div>
+
+    <!-- 加载两个地图 -->
+    <!-- <div id="allmap_1"></div>
+    <div id="allmap_2"></div> -->
+
+    <!-- 地图控件示例(添加/删除工具条、比例尺控件按键) -->
+    <!-- <div id="r-result">
+        <input type="button" onclick="add_control()" value="添加">
+        <input type="button" onclick="delete_control()" value="删除">
+    </div> -->
+
+    <!-- 覆盖物示例(添加/删除覆盖物) -->
+    <!-- <div id="r-result">
+        <input type="button" onclick="add_overlay()" value="添加覆盖物">
+        <input type="button" onclick="remove_overlay()" value="移除覆盖物">
+    </div> -->
+
+    <!-- 覆盖物示例(设置点是否可拖拽) -->
+    <!-- <div id="r-result">
+        <input type="button" onclick="marker.enableDragging()" value="可拖拽">
+        <input type="button" onclick="marker.disableDragging()" value="不可拖拽">
+    </div> -->
+
+    <!-- 覆盖物示例(设置线、面可编辑) -->
+    <!-- <div id="control">
+        <input type="button" onclick="polyline.enableEditing();polygon.enableEditing()" value="开启线、面编辑功能">
+        <input type="button" onclick="polyline.disableEditing();polygon.disableEditing()" value="关闭线、面编辑功能">
+    </div> -->
+
+    <!-- 覆盖物示例(设置覆盖物显示/隐藏) -->
+    <!-- <div id="r-result">
+        <input type="button" onclick="showOver()" value="显示">
+        <input type="button" onclick="hideOver()" value="隐藏">
+    </div> -->
+
+    <!-- 覆盖物示例(从多个点里删除特定点) -->
+    <!-- <input type="button" onclick="deletePoint()" value="删除id=1"> -->
+
+    <!-- 覆盖物示例(添加/删除地面叠加层) -->
+    <!-- <div id="r-result">
+        <input type="button" onclick="addGroundOverlay()" value="添加">
+        <input type="button" onclick="removeGroundOverlay()" value="删除">
+    </div> -->
+
+    <!-- 覆盖物示例(添加热力图) -->
+    <!-- <div id="r-result">
+        <input type="button" onclick="openHeatmap()" value="显示热力图">
+        <input type="button" onclick="closeHeatmap()" value="关闭热力图">
+    </div> -->
+
+    <!-- 覆盖物示例(矢量图标) -->
+    <!-- <div id="control">
+        <input type="button" onclick="hide()" value="隐藏">
+        <input type="button" onclick="show()" value="显示">
+    </div> -->
+</body>
+</html>
+
+<style>
+    #allmap {
+        width: 100%;
+        height: 800px;
+    }
+</style>
+<!-- 
+    *覆盖物示例(加载闪烁点、加载热力图、矢量图标)
+-->
+<script src="../lib/jquery/jquery-3.4.0.js"></script>
+<script src="http://api.map.baidu.com/api?v=2.0&ak=TjCKtYVELEqjFX3sGFnTBBcijkT4MTe3"></script>
+<script src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+<!-- 添加弧线 -->
+<!-- <script src="http://api.map.baidu.com/library/CurveLine/1.5/src/CurveLine.min.js"></script> -->
+<!-- 添加点聚合 -->
+<!-- <script src="http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js"></script> -->
+<!-- <script src="http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"></script> -->
+<!-- 添加热力图 -->
+<!-- <script src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script> -->
+<script type="text/javascript">
+    // 01-地图示例------------------------------------------------------------------------------------------
+    var map= new BMap.Map('allmap');   // 创建map实例
+    map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),10);  // 初始化地图,设置中心点坐标和地图级别
+    map.setCurrentCity('深圳');  // 设置地图显示的城市 此项是必须设置的 
+
+    // 2.1.1 设置地图风格类型
+    // map.setMapStyle({style:'grassgreen'});
+
+    // 2.1.2 开启鼠标滚轮缩放
+    map.enableScrollWheelZoom(true); // 地图默认事件不能进行缩放 允许缩放
+    // map.disableScrollWheelZoom(); // 禁止缩放
+    // map.disableDragging()  // 禁止地图拖拽, 地图默认可以拖拽  
+    map.enableInertialDragging() // 允许地图拖拽
+
+    // 2.1.3 添加地图类型控件--右上角地图/混合模式切换
+    // map.addControl(new BMap.MapTypeControl({
+    //     mapTypes: [
+    //         BMAP_NORMAL_MAP,  // 显示地图按钮
+    //         BMAP_HYBRID_MAP  // 显示混合按钮
+    //     ]
+    // }))
+
+    // 2.1.4 根据城市名称设置地图中心点
+    // var map= new BMap.Map('allmap'); // 创建map实例
+    // map.centerAndZoom('深圳',10); // 初始化地图,用城市名设置地图中心点
+
+    // 2.1.5 设置地图最大、最小级别
+    // var map= new BMap.Map("allmap",{minZoom:4,maxZoom:8});
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),8);
+
+    // 2.1.6 移动地图 (2s后从深圳移动到广州)
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),10);
+    // setTimeout(function(){
+    //     map.panTo(new BMap.Point(113.307649675,23.1200491021)) // 两秒后移动到广州
+    // },2000)
+
+    // 2.1.7 缩放地图 (2s后放大到14级)
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),10);
+    // setTimeout(function(){
+    //     map.setZoom(14) // 两秒后放大到14级
+    // },2000)   
+     
+    // 2.1.8 拖拽地图 (2s后开启地图拖拽功能)
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),10);
+    // map.disableDragging(); // 禁止拖拽
+    // setTimeout(function(){
+    //     map.enableDragging(); // 2秒后开启拖拽
+    // },2000)
+
+    // 2.1.9 设置地图显示范围
+    // "http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js" 引入
+    // var map= new BMap.Map("allmap");
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13);
+    // var b= new BMap.Bounds(new BMap.Point(114.025973657,22.5460535462),new BMap.Point(121.487899486,31.24916171));
+    // try {
+    //     BMapLib.AreaRestriction.setBounds(map,b);
+    // } catch(e) {
+    //     alert(e);
+    // }
+
+    // 2.1.10 获取地图显示范围
+    // var map= new BMap.Map("allmap");
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13); 
+    // var bs= map.getBounds();  // 获取可视区域
+    // var bssw= bs.getSouthWest(); // 可视区域左下角
+    // var bsne= bs.getNorthEast(); // 可视区域右上角
+    // alert(`当前地图可视区域是:${bssw.lng},${bssw.lat}到${bsne.lng},${bsne.lat}`)  
+    
+    // 2.1.11 获取两点间距离
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom('重庆',13); // 初始化地图,设置城市和地图级别
+    // var pointA= new BMap.Point(106.486654,29.490295); // 创建点坐标A--大渡口区
+    // var pointB= new BMap.Point(106.581515,29.615467); // 创建点坐标B-- 江北区
+    // alert(`从大渡口区到江北区的距离是:${(map.getDistance(pointA,pointB)).toFixed(2)}米`);
+    // var polyline= new BMap.Polyline([pointA,pointB],{strokeColor:'red',strokeWeight:6,strokeOpacity:0.5}); // 定义折线
+    // map.addOverlay(polyline);  // 添加折线到地图上
+
+    // 2.1.12 关闭默认地图POI事件
+    // var map= new BMap.Map('allmap',{enableMapClick:false});  // 构造底图时,关闭底图默认可点功能;
+    // var point= new BMap.Point(114.025973657,22.5460535462); // 创建点坐标
+    // map.centerAndZoom(point,13); // 初始化地图,设置中心点坐标和地图级别
+    // map.enableScrollWheelZoom(); // 启用滚轮放大缩小
+    
+    // 02-地图控件示例------------------------------------------------------------------------------------------
+    // 2.1.13 添加/删除工具条、比例尺控件
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13);
+    // var top_left_control= new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_LEFT}) // 左上角添加比例尺    
+    // var top_left_navigation= new BMap.NavigationControl(); // 左上角,添加默认缩放平移控件
+    // var top_right_navigation= new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT,type: BMAP_NAVIGATION_CONTROL_SMALL}); // 右上角仅包含平移和缩放按钮;
+    // // 添加控件和比例尺
+    // function add_control(){
+    //     map.addControl(top_left_control);
+    //     map.addControl(top_left_navigation);
+    //     map.addControl(top_right_navigation);
+    // }
+    // // 移除控件和比例尺
+    // function delete_control(){
+    //     map.removeControl(top_left_control);
+    //     map.removeControl(top_left_navigation);
+    //     map.removeControl(top_right_navigation);
+    // }
+
+    // 2.1.14 缩放控件type有四种类型:
+    // BMAP_NAVIGATION_CONTROL_SMALL:   // 仅包含平移和缩放按钮;
+    // BMAP_NAVIGATION_CONTROL_PAN:  // 仅包含平移按钮
+    // BMAP_NAVIGATION_CONTROL_ZOOM:  // 仅包含缩放按钮 
+
+    // 2.1.15 添加/删除地图类型、缩略图控件
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13);
+    // var mapType1= new BMap.MapTypeControl({
+    //     mapTypes: [BMAP_NORMAL_MAP,BMAP_HYBRID_MAP],
+    //     anchor: BMAP_ANCHOR_TOP_LEFT
+    // })
+    // var overView= new BMap.OverviewMapControl();
+    // var overViewOpen= new BMap.OverviewMapControl({
+    //     isOpen: true,
+    //     anchor: BMAP_ANCHOR_BOTTOM_RIGHT
+    // });
+    // // 添加地图类型和缩略图
+    // function add_control(){
+    //     map.addControl(mapType1);  // 2D图,混合图
+    //     map.addControl(overView); // 添加默认缩略地图控件
+    //     map.addControl(overViewOpen); // 右下角,打开
+    // } 
+    // // 移除地图类型和缩略图
+    // function delete_control(){
+    //     map.removeControl(mapType1);  // 2D图,混合图
+    //     map.removeControl(overView); // 添加默认缩略地图控件
+    //     map.removeControl(overViewOpen); // 右下角,打开
+    // } 
+
+    // 2.1.16 添加定位相关控件
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13);
+    // var navigationControl= new BMap.NavigationControl({ // 添加带有定位的导航控件
+    //     anchor: BMAP_ANCHOR_TOP_LEFT, // 靠左上角位置
+    //     type: BMAP_NAVIGATION_CONTROL_LARGE, // 靠左上角位置
+    //     enableGeolocation: true // 启用显示定位
+    // });
+    // map.addControl(navigationControl);
+    // // 添加定位控件
+    // var geolocationControl= new BMap.GeolocationControl();
+    // geolocationControl.addEventListener("locationSuccess",function(e){
+    //     // 定位成功事件
+    //     var address= "";
+    //     address += e.addressComponent.province;
+    //     address += e.addressComponent.city;
+    //     address += e.addressComponent.district;
+    //     address += e.addressComponent.street;
+    //     address += e.addressComponent.streetNumber;
+    //     alert(`当前定位地址为:${address}`);
+    // })
+    // geolocationControl.addEventListener("locationError",function(e){
+    //     alert(e.message);
+    // })
+    // map.addControl(geolocationControl);
+
+    // 2.1.17 添加第三方版权控件
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13);
+    // var cr= new BMap.CopyrightControl({anchor: BMAP_ANCHOR_BOTTOM_RIGHT}); // 设置版权控件位置
+    // map.addControl(cr);  // 添加版权控件
+    // var bs= map.getBounds(); // 返回地图可视区域
+    // cr.addCopyright({
+    //     id: 1,
+    //     content: "<a href='#' style='font-size:14px;text-decoration:none;color:black;background-color:white'>@新时空智能系统版权所有</a>",
+    //     bounds: bs,
+    //     color: 'black',
+    //     fontSize: "24px",
+    //     backgroundColor: 'GREEN'
+    // })
+
+    // 2.1.18 添加自定义控件
+    // (构造函数后,通过原型继承实现);
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13);
+    // function ZoomControl(){  // 定义一个控件方法(构造函数)
+    //     // 默认停靠位置和偏移量
+    //     this.defaultAnchor= BMAP_ANCHOR_BOTTOM_RIGHT;
+    //     this.defaultOffset= new BMap.Size(10,10);
+    // }
+    // // 通过javascript的prototype属性继承于BMap.Control
+    // ZoomControl.prototype= new BMap.Control();
+    // // 自定义控件必须实现自己的initialize方法,并且将控件的DOM元素返回
+    // // 在本方法中创建一个div元素作为控件的容器,并将其添加到地图容器中
+    // ZoomControl.prototype.initialize= function(map){
+    //     // 创建一个DOM元素
+    //     var div= document.createElement('div');
+    //     // 添加文字说明
+    //     div.appendChild(document.createTextNode('放大4级'));
+    //     // 设置样式
+    //     div.style.cursor= "pointer";
+    //     div.style.border= "1px solid gray";
+    //     div.style.backgroundColor= "white";
+    //     // 绑定事件,点击一次放大两级
+    //     div.onclick= function(e){
+    //         map.setZoom(map.getZoom()+4)
+    //     }
+    //     //  添加DOM元素到地图中
+    //     map.getContainer().appendChild(div);
+    //     //  将DOM元素返回
+    //     return div;
+    // }
+    // // 创建控件
+    // var myZoomCtrl= new ZoomControl();
+    // // 添加到地图当中
+    // map.addControl(myZoomCtrl);
+
+    // 2.1.19 添加城市列表控件
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(114.025973657,22.5460535462),13);
+    // // map.enableScrollWheelZoom(); // 允许地图缩放 
+    // // map.enableInertialDragging(); // 允许地图拖拽
+    // // map.enableContinuousZoom(); // 启用地图惯性拖拽,默认禁用
+    // var size= new BMap.Size(30,20); // 设置上面,右面的距离
+    // map.addControl(new BMap.CityListControl({
+    //     anchor: BMAP_ANCHOR_TOP_RIGHT,
+    //     offset: size,
+    //     // 选择目的城市, 切换城市之前事件
+    //     onChangeBefore: function(){
+    //         alert('before');
+    //     },
+
+    //     // 选择目的城市, 切换城市之后事件
+    //     onChangeAfter: function(){
+    //         alert('after');
+    //     } 
+    // }))
+
+    // 03-覆盖物示例------------------------------------------------------------------------------------------
+    // 2.1.20 添加/删除覆盖物   
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // map.enableScrollWheelZoom(true);
+    // var marker= new BMap.Marker(new BMap.Point(121.487899486,31.24916171)); // 创建点
+    // var polyline= new BMap.Polyline( // 创建折线
+    //     [
+    //     new BMap.Point(100.229628399,26.8753510895),
+    //     new BMap.Point(100.223674789,25.5968996394),
+    //     new BMap.Point(102.714601139,25.0491531005)
+    //     ],
+    //     {
+    //         strokeColor: 'blue',
+    //         strokeWeight: 2,
+    //         strokeOpacity: 0.5
+    //     }
+    // )    
+    // var circle= new BMap.Circle(point,500,{strokeColor: 'blue', strokeWeight: 2, strokeOpacity: 0.5}) // 创建圆
+    // var polygon= new BMap.Polygon( // 创建多边形
+    //     [
+    //         new BMap.Point(113.307649675,23.1200491021),
+    //         new BMap.Point(114.41065808,23.1135398524),
+    //         new BMap.Point(113.134025635,23.0350948405),
+    //         new BMap.Point(113.422060021,22.5451775145),
+    //         new BMap.Point(113.763433991,23.0430238154)
+    //     ],
+    //     {
+    //         strokeColor: 'red',
+    //         strokeWeight: 2,
+    //         strokeOpacity: 0.5
+    //     }
+    // )
+    // var pStart= new BMap.Point(116.392214,39.918985);  // 创建矩形
+    // var pEnd= new BMap.Point(116.41478,39.911901);
+    // var rectangle= new BMap.Polygon(
+    //     [
+    //         new BMap.Point(pStart.lng,pStart.lat),
+    //         new BMap.Point(pEnd.lng,pStart.lat),
+    //         new BMap.Point(pEnd.lng,pEnd.lat),
+    //         new BMap.Point(pStart.lng,pEnd.lat),
+    //     ],
+    //     {
+    //         strokeColor: 'yellowgreen',
+    //         strokeWeight: 2,
+    //         strokeOpacity: 0.5
+    //     }
+    // )   
+    // // 添加覆盖物
+    // function add_overlay(){
+    //     map.addOverlay(marker);  // 添加点
+    //     map.addOverlay(polyline);  // 添加折线
+    //     map.addOverlay(circle);  // 添加圆
+    //     map.addOverlay(polygon);  // 添加多边形
+    //     map.addOverlay(rectangle);  // 添加矩形
+    // }
+
+    // // 清除覆盖物
+    // function remove_overlay(){
+    //     map.clearOverlays();
+    // }
+
+    // 2.1.21 折线上添加方向箭头
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(113.307649675,23.1200491021),10);
+    // var sy= new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW,{
+    //     scale: 0.5, // 图标缩放大小
+    //     strokeColor: '#fff', // 设置矢量图标的线填充颜色
+    //     strokeWeight: '2', // 设置线宽
+    // });
+    // var icons= new BMap.IconSequence(sy,'10','30');
+    // // 创建polyline对象
+    // var pois= [
+    //     new BMap.Point(113.307649675,23.1200491021),
+    //     new BMap.Point(114.41065808,23.1135398524),
+    //     new BMap.Point(113.134025635,23.0350948405),
+    //     new BMap.Point(113.422060021,22.5451775145),
+    //     new BMap.Point(113.763433991,23.0430238154)
+    // ];
+    // var polyline= new BMap.Polyline(pois,{
+    //     enableEditing: false,  // 是否启用线编辑, 默认为false
+    //     enableClicking: true, // 是否响应点击事件, 默认为ture
+    //     icons: [icons],
+    //     strokeWeight: '8', // 折线的宽度,以像素为单位
+    //     strokeOpacity: 0.8, // 折线的透明度,取值范围0-1
+    //     strokeColor: '#18a45b' // 折线颜色
+    // })
+
+    // map.enableScrollWheelZoom(true);
+    // map.addOverlay(polyline);  // 增加折线
+
+    // 2.1.22 设置点的弹跳动画 
+    // var map= new BMap.Map('allmap');
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13); 
+    // var marker= new BMap.Marker(point); // 创建标注点
+    // map.addOverlay(marker); // 将标准添加到地图中
+    // marker.setAnimation(BMAP_ANIMATION_BOUNCE); // 跳动的动画 
+
+    // 2.1.23 设置点的新图标
+    // var map= new BMap.Map('allmap');
+    // var point= new BMap.Point(113.307649675,23.1200491021);
+    // map.centerAndZoom(point,13); 
+    // // 创建自定义坐标点
+    // var pt= new BMap.Point(113.307649675,23.1200491021);
+    // var myIcon= new BMap.Icon('../img/icon_car_in.png',new BMap.Size(300,157));
+    // var marker2= new BMap.Marker(pt,{icon:myIcon}); // 创建标准
+    // map.addOverlay(marker2);  // 将新标注添加到地图中
+
+    // 2.1.24 设置点是否可拖拽
+    // var map= new BMap.Map('allmap');
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // var marker= new BMap.Marker(point); // 创建标注
+    // map.addOverlay(marker); // 将标注添加到地图中
+    // marker.disableDragging(); // 不可拖拽
+
+    // 2.1.25 设置线、面可编辑
+    // var map= new BMap.Map('allmap');
+    // map.centerAndZoom(new BMap.Point(113.307649675,23.1200491021),10);
+    // var polyline= new BMap.Polyline( // 创建折线
+    //     [
+    //         new BMap.Point(113.307649675,23.1200491021),
+    //         new BMap.Point(114.41065808,23.1135398524),
+    //         new BMap.Point(113.134025635,23.0350948405),
+    //         new BMap.Point(113.422060021,22.5451775145),
+    //         new BMap.Point(113.763433991,23.0430238154)
+    //     ],
+    //     {
+    //         strokeColor: 'red',
+    //         strokeWeight: 2,
+    //         strokeOpacity: 0.5
+    //     }
+    // )
+    // map.addOverlay(polyline); // 增加折线
+    // var polygon= new BMap.Polygon(
+    //     [
+    //         new BMap.Point(118.778074408,32.0572355018),
+    //         new BMap.Point(118.296893379,33.9520497337),
+    //         new BMap.Point(117.188106623,34.2715534311),
+    //         new BMap.Point(120.619907115,31.317987368),
+    //         new BMap.Point(120.305455901,31.5700374519)
+    //     ],
+    //     {
+    //         strokeColor: 'green',
+    //         strokeWeight: 2,
+    //         strokeOpacity: 0.5
+    //     }
+    // )
+    // map.addOverlay(polygon);
+    // map.enableScrollWheelZoom(true);
+
+    // 2.1.26 设置覆盖物显示/隐藏
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // var marker= new BMap.Marker(new BMap.Point(113.040773349,23.6984685504)) // 创建标准
+    // map.addOverlay(marker);  // 将标准添加到地图中
+    // var polyline= new BMap.Polyline(
+    //     [
+    //         new BMap.Point(118.778074408,32.0572355018),
+    //         new BMap.Point(118.296893379,33.9520497337),
+    //         new BMap.Point(117.188106623,34.2715534311)
+    //     ],
+    //     {
+    //         strokeColor: 'green',
+    //         strokeWeight: 2,
+    //         strokeOpacity: 0.5
+    //     }
+    // )
+    // map.addOverlay(polyline);  // 增加折线
+    // var circle= new BMap.Circle(point,500); 
+    // map.addOverlay(circle);  // 增加圆
+    // hideOver();
+    // function showOver() {
+    //     marker.show();
+    //     polyline.show();
+    //     circle.show();
+    // }
+    // function hideOver(){
+    //     marker.hide();
+    //     polyline.hide();
+    //     circle.hide();
+    // }
+    // map.enableScrollWheelZoom(true);
+
+    // 2.1.27 添加文字标签
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // var opts= {
+    //     position: point, // 指定文本标注所在的地理位置
+    //     offset: new BMap.Size(0,-70) // 设置文本偏移量
+    // }
+    // var label= new BMap.Label('欢迎使用百度地图,这是一个简单的文本标注噢',opts); // 创建文本标注对象
+    // label.setStyle({
+    //     color: 'red',
+    //     fontSize: '12px',
+    //     height: "32px",
+    //     lineHeight: '32px',
+    //     paddingLeft: '8px',
+    //     paddingRight: '8px',
+    //     fontFamily: '微软雅黑'
+    // })
+    // map.addOverlay(label);
+
+    // 2.1.28 设置覆盖物的文字标签
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // var marker= new BMap.Marker(new BMap.Point(114.025973657,22.5460535462)) // 创建标准
+    // map.addOverlay(marker);  // 将标准添加到地图中
+    // var opts= {
+    //     position: point, // 指定文本标注所在的地理位置
+    //     offset: new BMap.Size(0,-45) // 设置文本偏移量
+    // }
+    // var label= new BMap.Label('欢迎使用百度地图,这是一个简单的文本标注噢',opts); // 创建文本标注对象
+    // label.setStyle({
+    //     color: 'red',
+    //     fontSize: '12px',
+    //     height: "32px",
+    //     lineHeight: '32px',
+    //     paddingLeft: '8px',
+    //     paddingRight: '8px',
+    //     fontFamily: '微软雅黑'
+    // })
+    // marker.setLabel(label);
+
+    // 2.1.29 获取覆盖物信息
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // var marker= new BMap.Marker(point); // 创建标准
+    // map.addOverlay(marker); 
+    // marker.addEventListener('click',getAttr);
+    // function getAttr(){
+    //     var p= marker.getPosition(); // 获取marker 的位置
+    //     alert(`标注点的位置是${p.lng},${p.lat}`);
+    // }
+
+    // 2.1.30 添加多个点示例
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // // 编写自定义函数,创建标注点
+    // function addMarker(point) {
+    //     var marker= new BMap.Marker(point);
+    //     map.addOverlay(marker);
+    // }
+    // // 随机向地图添加25个标准
+    // var bounds= map.getBounds();
+    // var sw= bounds.getSouthWest();
+    // var ne= bounds.getNorthEast();
+    // var lngSpan= Math.abs(sw.lng-ne.lng);
+    // var latSpan= Math.abs(ne.lat-sw.lat);
+    // for (var i= 0;i<25;i++){
+    //     var point= new BMap.Point(sw.lng+lngSpan*(Math.random()*0.7),ne.lat-latSpan*(Math.random()*0.7));
+    //     addMarker(point);
+    // }
+
+    // 2.1.31 从多个点里删除特定点
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,13);
+    // map.disableDoubleClickZoom(true);
+    // // 编写自定义函数,创建标注
+    // function addMarker(point,label){
+    //     var marker= new BMap.Marker(point);
+    //     map.addOverlay(marker);
+    //     marker.setLabel(label); 
+    // };
+    // // 随机向地图添加25个标注
+    // var bounds= map.getBounds();
+    // var sw= bounds.getSouthWest();
+    // var ne= bounds.getNorthEast();
+    // var lngSpan= Math.abs(sw.lng-ne.lng);
+    // var latSpan= Math.abs(ne.lat-sw.lat);
+    // for (var i= 0;i<25;i++){
+    //     var point= new BMap.Point(sw.lng+lngSpan*(Math.random()*0.7),ne.lat-latSpan*(Math.random()*0.7));
+    //     var label= new BMap.Label(`我是id=${i}`,{offset: new BMap.Size(20,-10)});
+    //     addMarker(point,label);
+    // } 
+    // function deletePoint(){
+    //     var allOverlay= map.getOverlays();
+    //     for(var i= 0; i<allOverlay.length-1;i++){
+    //         if(allOverlay[i].getLabel().content == '我是id=1'){
+    //             map.removeOverlay(allOverlay[i]);
+    //             return false;
+    //         }
+    //     }
+    // }
+
+    // 2.1.32 加载闪烁点
+		// var map = new BMap.Map("map", {});                        // 创建Map实例
+		// map.centerAndZoom(new BMap.Point(116.404, 39.915), 8);     // 初始化地图,设置中心点坐标和地图级别
+		// map.enableScrollWheelZoom();                            //启用滚轮放大缩小
+		// if (document.createElement('canvas').getContext) {
+		// 	var  mapStyle ={ 
+		// 			features: ["road", "building","water","land"],//隐藏地图上的poi
+		// 			style : "dark"  //设置地图风格为高端黑
+		// 		}
+		// 	map.setMapStyle(mapStyle);
+
+		// 	var BW            = 0,    //canvas width
+		// 		BH            = 0,    //canvas height
+		// 		ctx           = null,
+		// 		stars         = [],   //存储所有星星对象的数组
+		// 		timer         = null, //定时器
+		// 		timeLine      = null, //时间轴对象
+		// 		rs            = [],   //最新的结果
+		// 		isNowTimeData = false, //是否显示当前时间的定位情况
+		// 		py            = null, //偏移
+		// 		gridWidth     = 10000,//网格的大小
+		// 		isOverlay     = false,//是否叠加
+		// 		//gridWidth   = 1,//网格的大小
+		// 		canvas        = null; //偏移
+
+		// 	function Star(options){
+		// 		this.init(options);
+		// 	}
+
+		// 	Star.prototype.init = function(options) {
+		// 		this.x   = ~~(options.x);
+		// 		this.y   = ~~(options.y);
+		// 		this.initSize(options.size);
+		// 		if (~~(0.5 + Math.random() * 7) == 1) {
+		// 			this.size = 0;
+		// 		} else {
+		// 			this.size = this.maxSize;
+		// 		}
+		// 	}
+
+		// 	Star.prototype.initSize = function(size) {
+		// 		var size = ~~(size);
+		// 		this.maxSize = size > 6 ? 6 : size;
+		// 	}
+
+		// 	Star.prototype.render = function(i) {
+		// 			var p = this;
+
+		// 			if(p.x < 0 || p.y <0 || p.x > BW || p.y > BH) {
+		// 				return;
+		// 			}
+
+		// 			ctx.beginPath();
+		// 			var gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+		// 			gradient.addColorStop(0, "rgba(7,120,249,1)");
+		// 			gradient.addColorStop(1, "rgba(7,120,249,0.3)");
+		// 			ctx.fillStyle = gradient;
+		// 			ctx.arc(p.x, p.y, p.size, Math.PI*2, false);
+		// 			ctx.fill();
+		// 			if (~~(0.5 + Math.random() * 7) == 1) {
+		// 				p.size = 0;
+		// 			} else {
+		// 				p.size = p.maxSize;
+		// 			}
+		// 	}
+
+		// 	function render(){
+		// 		renderAction();
+		// 		setTimeout(render, 180);
+		// 	}
+
+		// 	function renderAction() {
+		// 		ctx.clearRect(0, 0, BW, BH);
+		// 		ctx.globalCompositeOperation = "lighter";
+		// 		for(var i = 0, len = stars.length; i < len; ++i){
+		// 			if (stars[i]) {
+		// 				stars[i].render(i);
+		// 			}
+		// 		}
+		// 	}
+
+
+		// 	// 复杂的自定义覆盖物
+		// 	function ComplexCustomOverlay(point){
+		// 	  this._point = point;
+		// 	}
+		// 	ComplexCustomOverlay.prototype = new BMap.Overlay();
+		// 	ComplexCustomOverlay.prototype.initialize = function(map){
+		// 	  this._map = map;
+		// 	  canvas = this.canvas = document.createElement("canvas");
+		// 	  canvas.style.cssText = "position:absolute;left:0;top:0;";
+		// 	  ctx = canvas.getContext("2d");
+		// 	  var size = map.getSize();
+		// 	  canvas.width = BW = size.width;
+		// 	  canvas.height = BH = size.height;
+		// 	  map.getPanes().labelPane.appendChild(canvas);
+		// 	  //map.getContainer().appendChild(canvas);
+		// 	  return this.canvas;
+		// 	}
+		// 	ComplexCustomOverlay.prototype.draw = function(){
+		// 		var map = this._map;
+		// 		var bounds = map.getBounds();
+		// 		var sw = bounds.getSouthWest();
+		// 		var ne = bounds.getNorthEast();
+		// 		var pixel = map.pointToOverlayPixel(new BMap.Point(sw.lng, ne.lat));
+		// 		py = pixel;
+		// 		if (rs.length > 0) {
+		// 			showStars(rs);
+		// 		}
+		// 	}
+		// 	var myCompOverlay = new ComplexCustomOverlay(new BMap.Point(116.407845,39.914101));
+		// 	map.addOverlay(myCompOverlay);
+
+		// 	var project = map.getMapType().getProjection();
+		// 	var bounds = map.getBounds();
+		// 	var sw = bounds.getSouthWest();
+		// 	var ne = bounds.getNorthEast();
+		// 	sw = project.lngLatToPoint(new BMap.Point(sw.lng, sw.lat));
+		// 	ne = project.lngLatToPoint(new BMap.Point(ne.lng, ne.lat));
+
+		// 	//左上角墨卡托坐标点
+		// 	var original = {
+		// 		x : sw.x,
+		// 		y : ne.y
+		// 	}
+
+
+		// 	var requestMgr = {
+		// 		request: function (time, successCbk) {
+		// 			if (document.location.host === 'developer.baidu.com') {
+		// 				var url = "/jsdemo/data/data";
+		// 			} else {
+		// 				var url = "../data/data";
+		// 			}
+					
+		// 			var xhr = new XMLHttpRequest();
+		// 			xhr.onreadystatechange = function() {
+		// 				if( xhr.readyState == 4  && xhr.status == 200 ) {
+		// 					if (!isOverlay) {
+		// 						rs = JSON.parse(xhr.responseText);
+		// 					} else {
+		// 						rs = rs.concat(JSON.parse(xhr.responseText));
+		// 						if (rs.length > 10000) {
+		// 							rs.splice(0, rs.length - 10000);
+		// 						}
+		// 					}
+		// 					showStars(rs);
+		// 					if (successCbk) {
+		// 						successCbk();
+		// 					}
+		// 				}
+		// 			}
+		// 			xhr.open( "GET", url, true );
+		// 			xhr.send( null );
+		// 		}
+		// 	}
+
+		// 	//显示星星
+		// 	function showStars(rs) {
+		// 		stars.length = 0;
+		// 		var temp = {};
+		// 		for (var i = 0, len = rs.length; i < len; i++) {
+		// 			var item = rs[i];
+		// 			var addNum = gridWidth / 2;
+		// 			var x = item[0] * gridWidth + addNum;
+		// 			var y = item[1] * gridWidth + addNum;
+		// 			var point = project.pointToLngLat(new BMap.Pixel(x, y));
+		// 			var px = map.pointToOverlayPixel(point);
+		// 				//create all stars
+		// 				var s = new Star({
+		// 					x: px.x - py.x, 
+		// 					y: px.y - py.y,
+		// 					size: item[2]
+		// 				});
+		// 				stars.push(s);
+		// 			//}
+		// 		}
+		// 		canvas.style.left = py.x + "px";
+		// 		canvas.style.top = py.y + "px";
+		// 		renderAction();
+		// 	}
+
+		// 	render();
+
+		// 	function nowTimeCbk (time) {
+		// 		requestMgr.request(time, function(){
+		// 			if (isNowTimeData) {
+		// 				setTimeout(function(){
+		// 					if (isNowTimeData) {
+		// 						startCbk(nowTimeCbk);
+		// 					}
+		// 				}, 1000);
+		// 			}
+		// 		});
+		// 	}
+		// 	function startCbk(cbk){
+		// 		var now = new Date();
+		// 		var time = {
+        //             hour: now.getHours(),
+        //             minute: now.getMinutes(),
+        //             second: now.getSeconds()
+        //         };
+        //         if(cbk){
+        //             cbk(time);
+        //         }
+        //     };
+        //     startCbk(nowTimeCbk);
+        // } else {
+        //     alert('浏览器版本显示有要求')
+        // }
+
+    // 2.1.33 加载海量点
+    // var map= new BMap.Map('allmap',{}); 
+    // var point= new BMap.Point(114.025973657,22.5460535462);
+    // map.centerAndZoom(point,8);
+    // map.enableScrollWheelZoom();
+    // if(document.createElement('canvas').getContext){ // 判断当前浏览器是否支持绘制海量点
+    //     var points= []; // 添加海量点数据
+    //     for (var i = 0; i < data.data.length; i++) {
+    //         points.push(new BMap.Point(data.data[i][0], data.data[i][1]));  // 海量点数据取值
+    //     }
+    //     var options= {
+    //         size: BMAP_POINT_SIZE_SMALL,
+    //         shape: BMAP_POINT_SHAPE_STAR,
+    //         color: '#d340c3'
+    //     }
+    //     var pointCollection= new BMap.PointCollection(points,options);  // 初始化PointCollection
+    //     pointCollection.addEventListener('click',function(e){
+    //         alert(`单击点的坐标为:${e.point.lng},${e.point.lat}`)
+    //     })
+    //     map.addOverlay(pointCollection); // 添加overlay
+    // } else {
+    //     alert('请升级浏览器版本');
+    // }
+
+    // 2.1.34 添加弧线  
+    // 需要引入文件 "http://api.map.baidu.com/library/CurveLine/1.5/src/CurveLine.min.js"
+    // var map= new BMap.Map('allmap',{}); 
+    // var point= new BMap.Point(116.432045,39.910683);
+    // map.centerAndZoom(point,5); 
+    // map.enableScrollWheelZoom();
+    // var beijingPosition=new BMap.Point(116.432045,39.910683),
+	// 	hangzhouPosition=new BMap.Point(120.129721,30.314429),
+	// 	taiwanPosition=new BMap.Point(121.491121,25.127053);
+	// var points = [beijingPosition,hangzhouPosition, taiwanPosition];
+    // var curve= new BMapLib.CurveLine(points,{  // 创建弧线对象
+    //     strokeColor: 'blue',
+    //     strokeWeight: 3,
+    //     strokeOpacity: 0.5
+    // })   
+    // map.addOverlay(curve); // 添加到地图中
+    // curve.enableEditing(); // 开启编辑功能
+
+    // 2.1.35 添加椭圆
+    // 需要引入文件 "http://api.map.baidu.com/library/CurveLine/1.5/src/CurveLine.min.js"
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(116.432045,39.910683);
+    // map.centerAndZoom(point,10);
+    // function add_oval(centre,x,y){ // centre 椭圆中心点, X 横向经度, Y纵向纬度
+    //     var assemble= new Array();
+    //     var angle;
+    //     var dot;
+    //     var tangent= x/y;
+    //     for(i=0;i<36;i++){
+    //         angle= (2*Math.PI/36)*i;
+    //         dot= new BMap.Point(centre.lng+Math.sin(angle)*y*tangent,centre.lat+Math.cos(angle)*y);
+    //         assemble.push(dot);
+    //     }
+    //     return assemble;
+    // }
+    // var oval= new BMap.Polygon(add_oval(point,0.1,0.3),{
+    //     strokeColor: 'blue',
+    //     strokeWeight: 6,
+    //     strokeOpacity: 0.5
+    // })
+    // map.addOverlay(oval);
+
+    // 2.1.36 添加行政区域
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(116.432045,39.910683);
+    // map.centerAndZoom(point,10);
+    // map.enableScrollWheelZoom(true);
+    // function getBoundary(){
+    //     var bdary= new BMap.Boundary();
+    //     bdary.get('深圳市龙华区',function(rs){ // 获取行政区域
+    //         map.clearOverlays(); //清除地图覆盖物
+    //         var count= rs.boundaries.length;  // 行政区域的点有多少个
+    //         if(count === 0){
+    //             alert('未能获取当前输入行政区域');
+    //             return;
+    //         }
+    //         var pointArray= [];
+    //         for(var i=0;i<count;i++){
+    //             var ply= new BMap.Polygon(rs.boundaries[i],{ // 建立多边形覆盖物
+    //                 strokeWeight: 2,
+    //                 strokeColor: '#ff0000'
+    //             })
+    //             map.addOverlay(ply); // 添加覆盖物
+    //             pointArray= pointArray.concat(ply.getPath());
+    //         }
+    //         map.setViewport(pointArray); // 调整视野
+    //         addlabel()
+    //     })
+    // }
+
+    // setTimeout(function(){
+    //     getBoundary();
+    // },2000)
+
+    // function addlabel() { // 添加文本标签
+	//     var pointArray = [
+	//       new BMap.Point(121.716076,23.703799), // 台湾
+	//       new BMap.Point(112.121885,14.570616), // 南海
+	//       new BMap.Point(123.776573,25.695422)]; // 钓鱼钓
+	//     var optsArray = [{},{},{}];
+	//     var labelArray = [];
+	//     var contentArray = [
+	//       "台湾是中国的！",
+	//       "南海是中国的！",
+	//       "钓鱼岛是中国的！"];
+	//     for(var i = 0;i < pointArray.length; i++) {
+	//       optsArray[i].position = pointArray[i];
+	//       labelArray[i] = new BMap.Label(contentArray[i],optsArray[i]);
+	//       labelArray[i].setStyle({
+	// 		color : "red",
+	// 		fontSize : "12px",
+	// 			 height : "20px",
+	// 			 lineHeight : "20px",
+	// 			 fontFamily:"微软雅黑"
+	// 		 });
+	//       map.addOverlay(labelArray[i]);
+	//     }	  
+	// }
+
+    // 2.1.37 添加自定义覆盖物
+	// var mp = new BMap.Map("allmap");
+	// mp.centerAndZoom(new BMap.Point(116.3964,39.9093), 15);
+	// mp.enableScrollWheelZoom();
+	// // 复杂的自定义覆盖物
+    // function ComplexCustomOverlay(point, text, mouseoverText){
+    //   this._point = point;
+    //   this._text = text;
+    //   this._overText = mouseoverText;
+    // }
+    // ComplexCustomOverlay.prototype = new BMap.Overlay();
+    // ComplexCustomOverlay.prototype.initialize = function(map){
+    //   this._map = map;
+    //   var div = this._div = document.createElement("div");
+    //   div.style.position = "absolute";
+    //   div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+    //   div.style.backgroundColor = "#EE5D5B";
+    //   div.style.border = "1px solid #BC3B3A";
+    //   div.style.color = "white";
+    //   div.style.height = "18px";
+    //   div.style.padding = "2px";
+    //   div.style.lineHeight = "18px";
+    //   div.style.whiteSpace = "nowrap";
+    //   div.style.MozUserSelect = "none";
+    //   div.style.fontSize = "12px"
+    //   var span = this._span = document.createElement("span");
+    //   div.appendChild(span);
+    //   span.appendChild(document.createTextNode(this._text));      
+    //   var that = this;
+
+    //   var arrow = this._arrow = document.createElement("div");
+    //   arrow.style.background = "url(//map.baidu.com/fwmap/upload/r/map/fwmap/static/house/images/label.png) no-repeat";
+    //   arrow.style.position = "absolute";
+    //   arrow.style.width = "11px";
+    //   arrow.style.height = "10px";
+    //   arrow.style.top = "22px";
+    //   arrow.style.left = "10px";
+    //   arrow.style.overflow = "hidden";
+    //   div.appendChild(arrow);
+     
+    //   div.onmouseover = function(){
+    //     this.style.backgroundColor = "#6BADCA";
+    //     this.style.borderColor = "#0000ff";
+    //     this.getElementsByTagName("span")[0].innerHTML = that._overText;
+    //     arrow.style.backgroundPosition = "0px -20px";
+    //   }
+
+    //   div.onmouseout = function(){
+    //     this.style.backgroundColor = "#EE5D5B";
+    //     this.style.borderColor = "#BC3B3A";
+    //     this.getElementsByTagName("span")[0].innerHTML = that._text;
+    //     arrow.style.backgroundPosition = "0px 0px";
+    //   }
+
+    //   mp.getPanes().labelPane.appendChild(div);
+      
+    //   return div;
+    // }
+    // ComplexCustomOverlay.prototype.draw = function(){
+    //   var map = this._map;
+    //   var pixel = map.pointToOverlayPixel(this._point);
+    //   this._div.style.left = pixel.x - parseInt(this._arrow.style.left) + "px";
+    //   this._div.style.top  = pixel.y - 30 + "px";
+    // }
+    // var txt = "银湖海岸城", mouseoverTxt = txt + " " + parseInt(Math.random() * 1000,10) + "套" ;
+        
+    // var myCompOverlay = new ComplexCustomOverlay(new BMap.Point(116.407845,39.914101), "银湖海岸城",mouseoverTxt);
+
+    // mp.addOverlay(myCompOverlay);
+
+    // 2.1.38 添加/删除地面叠加层
+    // var TianAnMen = new BMap.Point(116.404449, 39.914889);
+
+    // // 创建Map实例
+    // var map = new BMap.Map("allmap");
+
+    // // 居中放大
+    // map.centerAndZoom(TianAnMen, 12);
+
+    // // 启用滚轮放大缩小
+    // map.enableScrollWheelZoom();
+
+    // // 西南角和东北角
+    // var SW = new BMap.Point(116.29579,39.837146);
+    // var NE = new BMap.Point(116.475451,39.9764);
+
+    // groundOverlayOptions = {
+    //     opacity: 1,
+    //     displayOnMinLevel: 10,
+    //     displayOnMaxLevel: 14
+    // }
+
+    // // 初始化GroundOverlay
+    // var groundOverlay = new BMap.GroundOverlay(new BMap.Bounds(SW, NE), groundOverlayOptions);
+
+    // // 设置GroundOverlay的图片地址
+    // groundOverlay.setImageURL('../img/icon_car_in.png');
+
+    // // 单击事件
+    // groundOverlay.addEventListener('click', function (clickEvent) {
+    //     // console.log('clickEvent', clickEvent);
+    //     console.log('单击覆盖物区域被触发')
+    // });
+
+    // // 双击事件
+    // groundOverlay.addEventListener('dblclick', function (dblclickEvent) {
+    //     // console.log('dblclickEvent', dblclickEvent);
+    //     console.log('双击覆盖物区域被触发')
+    // });
+
+    // function addGroundOverlay() {
+    //     // 添加GroundOverlay
+    //     map.addOverlay(groundOverlay);
+    // }
+
+    // function removeGroundOverlay() {
+    //     // 移除GroundOverlay
+    //     map.removeOverlay(groundOverlay);
+    // }
+
+    // 2.1.39 点聚合
+    // 需要引入文件
+    // "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js"
+    // "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"
+    // var map = new BMap.Map("allmap");
+	// map.centerAndZoom(new BMap.Point(116.3964,39.9093), 3);
+	// map.enableScrollWheelZoom();
+    // var MAX= 10;
+    // var markers= [];
+    // var pt= null;
+    // var i= 0;
+    // for (; i < MAX; i++) {
+    //     pt= new BMap.Point(Math.random()*40+85,Math.random()*30+21);
+    //     markers.push(new BMap.Marker(pt));
+    // }
+    // //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
+	// var markerClusterer = new BMapLib.MarkerClusterer(map, {markers:markers});
+
+    // 2.1.40 添加热力图
+    // 需要引入文件
+    // "http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"
+
+    // 2.1.41 矢量图标   
+
+    // 04-信息窗口示例------------------------------------------------------------------------------------------    
+    // 2.1.42 添加纯文字的信息窗口    
+    // var map= new BMap.Map('allmap'); 
+    // var point= new BMap.Point(116.432045,39.910683);
+    // map.centerAndZoom(point,10);
+    // var marker= new BMap.Marker(point); // 创建标注
+    // map.addOverlay(marker);
+    // var opts= {
+    //     width: 200,  // 信息窗口宽度
+    //     height: 100, // 信息窗口高度
+    //     offset: {height:-16,width:-2}, // 设置信息窗偏移量
+    //     title: '新时空智能系统', // 信息窗口标题
+    //     enableMessage: true,  // 设置允许信息窗发送信息
+    //     message: "高端卫星服务提供商"
+    // }
+    // var infoWindow= new BMap.InfoWindow('地址:广东省深圳市福田区',opts); // 创建信息窗口对象
+    // marker.addEventListener('click',function(){
+    //     map.openInfoWindow(infoWindow,point); // 开启信息窗口
+    // })     
+
+    // 2.2 异步加载地图
+    // function loadJScript() {  // 百度地图API功能
+    //     var script= document.createElement("script");
+    //     script.type= "text/javascript";
+    //     script.src= "http://api.map.baidu.com/api?v=2.0&ak=TjCKtYVELEqjFX3sGFnTBBcijkT4MTe3";
+    //     document.body.appendChild(script);
+    //     init()
+    // }
+    // function init(){
+    //     var map= new BMap.Map("allmap");    // 创建Map实例
+    //     var point= new  BMap.Point(114.025973657,22.5460535462); // 创建默认加载点坐标
+    //     map.centerAndZoom(point,10); // 加载初始化点
+    //     map.enableScrollWheelZoom(); // 启动滚轮放大缩小
+    //     map.setMapStyle({style:'grassgreen'});
+    // }
+    // window.onload= loadJScript();
+
+    // 2.3 同时加载两个地图
+
+    // 2.3.1 加载第一张地图
+    // var map1= new BMap.Map("allmap_1"); // 创建Map实例
+    // var point1= new BMap.Point(114.025973657,22.5460535462);
+    // map1.centerAndZoom(point1,10);
+    // map1.enableScrollWheelZoom();  // 启用滚轮放大缩小
+    // // 2.3.2 加载第二张地图
+    // var map2= new BMap.Map("allmap_2"); // 创建Map实例
+    // var point2= new BMap.Point(115.050683164,30.2161271277);
+    // map2.centerAndZoom(point2,10);
+    // map2.enableScrollWheelZoom();  // 启用滚轮放大缩小
+</script>

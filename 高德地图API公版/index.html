@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./img/logo.ico">
+    <title>高德地图API</title>
+</head>
+<style>
+    html,
+    body,
+    #container {
+        width: 100%;
+        height: 95%;
+    }
+
+    .dashboard {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        width: 16rem;
+        text-align: center;
+        padding: 12px 0px;
+        background-color: antiquewhite;
+    }
+</style>
+<body>
+    <div id="container"></div>
+
+    <!-- 地图-生命周期-地图销毁操作按钮 -->
+    <!-- <div class="input-card dashboard">
+        <h4>创建、销毁地图</h4>
+        <div id="btns">
+            <div class="input-item">
+            <button id="create-btn" class="btn" style="margin-right:1rem;">创建地图</button>
+            <button id="destroy-btn" class="btn">销毁地图</button>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- 地图-地图属性-中、英文地图 -->
+    <div class="input-card dashboard">
+        <h4>底图语言切换</h4>
+        <div id="lang">
+            <div class="input-item"><input id="en" name="language" type="radio" checked="checked"><span class="input-text">英文底图</span></div>
+            <div class="input-item"><input id="zh_en" name="language" type="radio"><span class="input-text">中英对照</span></div>
+            <div class="input-item"><input id="zh_cn" name="language" type="radio"><span class="input-text">中文底图</span></div>
+        </div>
+    </div>
+
+    <!-- 地图-地图属性-获取地图中心点/级别 -->
+    <!-- <div class="info dashboard">
+        <h4>获取地图级别与中心点坐标</h4>
+        <p>当前级别：<span id="map-zoom">11</span></p>
+        <p>当前中心点：<span id="map-center">121.498586,31.239637</span></p>
+    </div> -->
+</body>
+</html>
+<!-- 初始化地图文件 -->
+<script src="https://webapi.amap.com/maps?v=1.4.15&key=0c450bb1be594446989f9d58d7f13ec9"></script>
+
+<script>
+    // 1.0 地图
+    // 1.1 生命周期
+    // 1.1.1 地图的创建
+    // var map = new AMap.Map('container',{
+    //     zoom: 5, // 初始化地图层级
+    //     center: [121.487899486,31.24916171] //初始化地图中心点
+    //     resizeEnable: true, //是否监控地图容器尺寸变化
+    // })
+
+    // 1.1.2 地图加载完成
+    // var map= map = new AMap.Map('container',{
+    //     resizeEnable: true
+    // })
+
+    // map.on('complete',function(){
+    //     alert('地图加载完成');
+    // })
+
+    // 1.1.3 地图的销毁
+        // var map= null;
+        // function createMap(){
+        //     map = new AMap.Map('container',{
+        //         zoom: 3,
+        //         resizeEnable: true,
+        //         center: [121.487899486,31.24916171]
+        //     })
+        //     alert('创建地图成功')
+        // }
+
+        // function destroyMap(){
+        //     map && map.destroy();
+        //     alert('地图已销毁')
+        // }
+
+        // // 初始化地图
+        // createMap();
+        
+        // // 绑定创建、销毁事件
+        // document.querySelector('#create-btn').onclick= createMap;
+        // document.querySelector('#destroy-btn').onclick= destroyMap; 
+
+    // 1.1.4 异步加载地图
+        // function onApiLoaded(){
+        //     var map = new AMap.Map('container', {
+        //         center: [121.487899486,31.24916171],
+        //         zoom: 3
+        //     });
+        // }
+        // var url = 'https://webapi.amap.com/maps?v=1.4.15&key=0c450bb1be594446989f9d58d7f13ec9&callback=onApiLoaded';
+        // var jsapi = document.createElement('script');
+        // jsapi.charset = 'utf-8';
+        // jsapi.src = url;
+        // document.head.appendChild(jsapi);
+
+    // 1.2 地图属性
+    // 1.2.1  中英文地图 
+        var map= new AMap.Map('container',{
+            resizeEnable: true,
+            center: [121.487899486,31.24916171],
+            zoom: 12,
+            lang: 'zh_en'  // 可选值 en, zh_en, zh_cn
+        });
+        // 绑定切换点击事件
+        var radios= document.querySelectorAll('#lang input');
+        radios.forEach(function(ratio){
+            ratio.onclick = setLang;
+        });
+
+        function setLang(){
+            map.setLang(this.id);
+        }
+
+    // 1.2.2  获取地图中心点/级别
+        //初始化地图
+        // var map = new AMap.Map('container', {
+        // resizeEnable: true, //是否监控地图容器尺寸变化
+        // zoom: 8, //初始地图级别
+        // center: [121.498586, 31.239637], //初始地图中心点
+        // });
+
+        // //显示地图层级与中心点信息
+        // function logMapinfo(){
+        //     var zoom = map.getZoom(); //获取当前地图级别
+        //     var center = map.getCenter(); //获取当前地图中心位置
+
+        //     document.querySelector("#map-zoom").innerText = zoom;
+        //     document.querySelector("#map-center").innerText = center.toString();
+        // };
+
+        // //绑定地图移动与缩放事件
+        // map.on('moveend', logMapinfo);
+        // map.on('zoomend', logMapinfo);        
+
+</script>
